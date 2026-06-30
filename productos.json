@@ -4,5 +4,11 @@
         "nombre": "teclado",
         "categoria": "tec",
         "precio": 20.0
+    },
+    {
+        "id": 3,
+        "nombre": "Coca",
+        "categoria": "Bebida",
+        "precio": 2.0
     }
 ]

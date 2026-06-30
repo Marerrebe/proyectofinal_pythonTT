@@ -86,7 +86,7 @@ def main() -> None:
         elif opcion == "4":
             accion_eliminar(lista_productos)
         elif opcion == "5":
-            print("\n Hasta luego")
+            print("\n Gracias. Vuelva pronto 👋")
             break
         else:
             print("\n Opcion invalida. Igresa un nuemor del 1 al 5")
