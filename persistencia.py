@@ -1,14 +1,15 @@
 """
 Guarda y carga products desde el disco.
 """
-
 import json
 import sqlite3
 import os
+import config
 from datetime import datetime
 
-ARCHIVO_JSON = "productos.json"
-ARCHIVO_ERRORES = "errores.log"
+ARCHIVO_JSON = config.ARCHIVO_JSON
+ARCHIVO_ERRORES = config.ARCHIVO_ERRORES
+ARCHIVO_DB = config.ARCHIVO_DB
 
 #-------------------  LOG DE ERRORES EN TXT (.log)  ------------------
 def registrar_error(mensaje:str) -> None:
@@ -24,6 +25,51 @@ def registrar_error(mensaje:str) -> None:
     except Exception as e:
         print(f"No se pudo escribir en el log: {linea.strip()}")
         print(f"El error es {e}")
+
+# -------- SQL -------------
+def obtener_conexion() -> sqlite3.Connection:
+    conexion = sqlite3.connect(ARCHIVO_DB)
+    conexion.row_factory = sqlite3.Row
+    return conexion
+
+def crear_tabla():
+    sql = """
+        CREATE TABLE IF NOT EXISTS productos (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        nombre TEXT NOT NULL,
+        categoria TEXT NOT NULL,
+        precio REAL NOT NULL
+        )
+    """
+    try:
+        with obtener_conexion() as con:
+            con.execute(sql)
+        return True
+    except Exception as e:
+        msg = f"[SQL] error al crear la tabla: {e}"
+        print(f"{msg} - se usara JSON para reemplazo")
+        registrar_error(msg)
+        return False
+
+def sql_obtener_todos() -> list:
+    sql = "SELECT id, nombre, categoria, precio FROM productos ORDER BY id"
+    with obtener_conexion() as con:
+        return [dict(fila) for fila in con.execute(sql).fetchall()]
+
+def sql_insertar(nombre: str, categoria: str, precio: float) -> dict:
+    sql = "INSERT INTO productos (nombre, categoria, precio) VALUES (?, ?, ?)"
+    with obtener_conexion() as con:
+        cursor = con.execute(sql, (nombre, categoria, precio))
+    # cursor = con.execute("INSERT INTO productos (nombre, categoria, precio) VALUES (?, ?, ?)",(nombre, categoria, precio))
+        return {"id": cursor.lastrowid, "nombre": nombre, "categoria": categoria, "precio": precio}
+
+def sql_eliminar(id_a_eliminar: int) -> bool:
+    sql = "DELETE FROM productos WHERE id = ?"
+    with obtener_conexion() as con:
+        cursor = con.execute(sql, (id_a_eliminar,))
+        return cursor.rowcount > 0
+
+# --------- JSON --- -----
 
 def guardar_json(productos: list) -> bool:
     """
@@ -90,3 +136,14 @@ def proximo_id(productos: list) -> int:
             id_maximo = p["id"]
 
     return id_maximo + 1
+
+def obtener_todos() -> list:
+    try:
+        productos = sql_obtener_todos()
+        print("datos cargados correctamente")
+        return productos
+    except Exception as e:
+        registrar_error(f"obtener todo la base de SQLite fallo: {e}" )
+        print("SQLite no funcionam, usarando json")
+        return cargar_json()
+

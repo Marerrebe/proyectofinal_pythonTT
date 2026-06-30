@@ -5,7 +5,7 @@ este modulo no tiene logica de negocio ni acceso a archivos externos.
 """
 import utils
 
-def menu() -> None:
+def mostrar_menu() -> None:
     """ Muestra del menu """
     print("\n" + "=" * 50)
     print("             SISTEMA DE GESTION DE PRODUCTOS ")
@@ -14,8 +14,8 @@ def menu() -> None:
     print("2. Ver producto")
     print("3. Buscar producto")
     print("4. Eliminar producto")
-    print("5. Estadisticas")
-    print("6. Salir")    
+    print("5. Salir")
+   
 
 def pedir_opcion() -> str:
     """ pide y devuelve una opcion elegida por un usuario"""
@@ -56,7 +56,7 @@ def mostrar_lista_productos(productos: list) -> None:
     print("-" *55)
     print(f" Total de productos: {len(productos)}")
 
-def dedir_id_eliminar() -> int:
+def pedir_id_eliminar() -> int:
     """
     Pide el ID del producto a eliminar
     """
@@ -73,3 +73,6 @@ def pedir_termino_busqueda() -> str:
     Pide el termino de busqueda al usuarios
     """
     return utils.validar_str("\n Ingresa el nombre a buscar: ", campo="término de busqueda")
+
+
+ 

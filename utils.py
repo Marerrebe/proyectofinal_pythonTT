@@ -52,3 +52,4 @@ def preguntar_si_no(mensaje:str) -> bool:
             return False
         else:
             print("  ❌ Ingresá 's' para sí o 'n' para no.")
+
